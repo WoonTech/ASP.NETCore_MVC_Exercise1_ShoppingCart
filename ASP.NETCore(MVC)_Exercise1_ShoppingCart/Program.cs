@@ -1,8 +1,14 @@
+using ASP.NETCore_MVC__Exercise1_ShoppingCart.Controllers.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddDbContext<ShoppingCartContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("ShoppingCartContext"));
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
