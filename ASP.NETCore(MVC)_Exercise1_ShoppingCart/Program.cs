@@ -1,16 +1,30 @@
 using ASP.NETCore_MVC__Exercise1_ShoppingCart.Controllers.Infrastructure;
+using ASP.NETCore_MVC__Exercise1_ShoppingCart.Models;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-builder.Services.AddControllersWithViews();
+ 
+// Add services to the dependency injection container.
+builder.Services.AddControllersWithViews(); 
 builder.Services.AddDbContext<ShoppingCartContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("ShoppingCartContext"));
 });
-var app = builder.Build();
 
+//Build the web application
+var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        SeedData.Initialize(services);
+    }
+    catch (Exception)
+    {
+        throw;
+    }
+}
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -25,7 +39,9 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
-
+app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
